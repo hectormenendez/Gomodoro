@@ -6,7 +6,7 @@ import Config from '~/utils/config.json';
 
 export const Name = 'GOMODORO';
 
-export const StoreKey = `${Config.storekey}:${Name}`;
+export const StoreKey = `${Config.storeKey}:${Name}`;
 
 export const Types = PropTypes.object.isRequired;
 
@@ -30,7 +30,7 @@ export const { Actions, Reducers } = Factory(State, {
     reset: {
         action: () => dispatch => AsyncStorage
             .removeItem(StoreKey)
-            .then(() => dispatch(Actions.get()))
+            .then(() => dispatch(Actions.get())),
     },
 
     /**
@@ -64,10 +64,8 @@ export const { Actions, Reducers } = Factory(State, {
                 const nextState = Object
                     .keys(payload)
                     .reduce((acc, key) => ({
-                        [key]: Math.ceil((
-                            state[key] +
-                            ((payload[key] / 1000) / 60)
-                        ) / 2),
+                        ...acc,
+                        [key]: Math.ceil((state[key] + ((payload[key] / 1000) / 60)) / 2),
                     }), state);
                 return AsyncStorage
                     .setItem(StoreKey, JSON.stringify(nextState))
@@ -75,5 +73,6 @@ export const { Actions, Reducers } = Factory(State, {
             }),
 
         reducer: (prevState, state) => state,
+
     },
 }, Name);
