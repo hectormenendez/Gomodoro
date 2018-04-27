@@ -1,32 +1,37 @@
-import { Todoist, $fromInput, $fromItemId } from './utils';
+import { Trace, Todoist, $fromInput, $fromItemId } from './utils';
 
 const input$ = $fromInput('Item ID to calculate duration');
 
-const getDuration = (item, duration = { est: [], act: [] }) => {
+const RX = /\*\*Estimated:\*\* (\d+:\d+) \*\*Actual:\*\* (\d+:\d+)/i;
 
+const getDuration = (item, duration = { est: [], act: [] }) => {
+    const self = `getDuration(${item.id})`;
+    Trace(`${self}:ini`);
     // populat the duration traversing all the children
     item.children.forEach((node) => {
+        const subself = `${self}:node[${node.id}](${node.content.slice(0, 10)}…)`;
+        Trace(`${subself}:ini`);
         // get duration recursively if this item has children of its own.
         if (node.children.length) getDuration(node, duration);
         // No childrens, store duration (if available)
         else if (node.notes.length) {
-            node.notes
-                // iterate each note to find time notation marks.
-                .map(({ content }) => content
-                    .match(/\d+:\d+/g)
+            node.notes.forEach((note) => {
+                const nself = `${subself}:note[${note.id}](${note.content.slice(0, 10)}..)`;
+                const match = note.content.match(RX);
+                if (!match) return Trace(`${nself}:no-match`);
+                const [est, act] = match
+                    .slice(1, 3)
                     .map((text) => {
                         const [mm, ss] = text.split(':');
                         return { mm, ss };
-                    }),
-                )
-                .filter(times => times.length === 2)
-                .forEach(([est, act]) => {
-                    duration.est.push(est);
-                    duration.act.push(act);
-                });
+                    });
+                duration.est.push(est);
+                duration.act.push(act);
+                return Trace(`${nself}:match`, { est, act });
+            });
         }
     });
-
+    Trace(`${self}:duration`, JSON.stringify(duration));
     const calculate = (target) => {
         const sum = target.reduce((acc, cur) => ({
             mm: acc.mm + parseInt(cur.mm, 10),
@@ -42,6 +47,7 @@ const getDuration = (item, duration = { est: [], act: [] }) => {
 
     const est = calculate(duration.est);
     const act = calculate(duration.act);
+    Trace(`${self}:end`);
     return `**Estimated:** ${est} **Actual:** ${act}`;
 };
 

@@ -2,7 +2,8 @@ import { $fromInput, Test$ } from './utils';
 import GomodoroCounter$ from './gomodoro-counter';
 import CalculateDuration$ from './calculate-duration';
 
-console.clear(); // eslint-disable-line no-console
+// eslint-disable-next-line no-console
+if (process.env.NODE_ENV !== 'development') console.clear();
 
 const prompt = [
     'Type the corresponfing number and press enter.',

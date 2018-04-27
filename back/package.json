@@ -12,7 +12,7 @@
     "scripts": {
         "build": "gik-npm lint src && gik-npm build",
         "test": "npm run build && node --inspect ./build",
-        "start": "gik-npm start 'yarn test'"
+        "start": "NODE_ENV=development gik-npm start 'yarn test'"
     },
     "dependencies": {
         "rxjs": "^5.5.10",

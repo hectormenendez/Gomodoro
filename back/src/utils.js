@@ -2,19 +2,34 @@ import TodoistClient from 'todoist-js';
 import { Observable } from 'rxjs';
 
 import { todoist as Config } from '../config.json';
-// import State from '../state.json';
 
 export const Todoist = new TodoistClient(Config.token);
 
+export const Exception = (message) => {
+    if (process.env.NODE_ENV !== 'development') {
+        process.stderr.write(`\n${message}\n`);
+        process.exit(1);
+    }
+    throw new Error(message);
+};
+
+export const Trace = (...args) => {
+    if (process.env.NODE_ENV !== 'development') return null;
+    return console.log(...['[DEBUG] '].concat(args)); // eslint-disable-line no-console
+};
+
+
+// import State from '../state.json';
 export const State$ = Observable
     .fromPromise(Todoist.sync())
-    .do(console.log('[ todoist sync ]'))
+    .do(() => Trace('State$'))
     .publishReplay()
     .refCount();
 
 // export const State$ = Observable.of(State);
 
 export const $fromInput = text => Observable.create((observer) => {
+    Trace(`$fromInput(${text.slice(0, 10)}…)`);
     process.stdout.write(`${text}\n`);
     process.stdin.setEncoding('utf8');
     process.stdin.on('data', (data) => {
@@ -28,6 +43,7 @@ export const $fromItemId = id => Observable
     .do(() => {
         if (typeof id !== 'number')
             throw new Error('Invalid identifier type, expecting number');
+        Trace(`$fromItemId(${id}):ini`);
     })
     // Obtain the state, get the items and start observing each item.
     .switchMap(() => State$.switchMap(state => state.items))
@@ -50,5 +66,6 @@ export const $fromItemId = id => Observable
             .map(({ notes }) => notes.filter(node => node.item_id === id));
         return Observable.combineLatest(children$, notes$, [item]);
     })
-    .map(([children, notes, item]) => ({ ...item, children, notes }));
+    .map(([children, notes, item]) => ({ ...item, children, notes }))
+    .do(() => Trace(`$fromItemId(${id}):end`));
 
