@@ -24,6 +24,19 @@ export const State = [1, 2, 3, 5, 8]
 
 export const { Actions, Reducers } = Factory(State, {
 
+    /**
+     * Rewrites the current state with the default one.
+     */
+    reset: {
+        action: () => dispatch => AsyncStorage
+            .removeItem(StoreKey)
+            .then(() => dispatch(Actions.get()))
+    },
+
+    /**
+     * Retrieves the gomodoro table from AsyncStorage, if nothing found initializes it.
+     * once done that, it sets the current state using it.
+     */
     get: {
         action: type => dispatch => AsyncStorage
             .getItem(StoreKey)
@@ -38,6 +51,12 @@ export const { Actions, Reducers } = Factory(State, {
         reducer: (prevState, state) => state,
     },
 
+    /**
+     * Merges given object with the one in the AsyncStorage and sets the state
+     * using the result.
+     * @param {Object} payload - An object containing key-val table for the gomodoros.
+     *                          example: { 1: 12 }. Gomoro 1 = 12 minutes
+     */
     set: {
         action: (type, payload) => dispatch => dispatch(Actions.get())
             .then(({ payload: state }) => {

@@ -19,23 +19,33 @@ export const State = {
 
 export const { Actions, Reducers } = Factory(State, {
 
+    /**
+     * Establish a selected item.
+     * @param {TodoistItem} item - An object containing the information about an item.
+     * @see ~/stores/todoist
+     */
     setItem: {
-        action: (type, payload) => dispatch => dispatch({ type, payload }),
+        action: (type, item) => dispatch => dispatch({ type, payload: item }),
         reducer: (state, item) => ({ time: State.time, item }),
     },
 
-    // The user selected a gomodoro, obtain the corresponding time and set it.
+    /**
+     * Establish a selectes time, according to given gomodoro unit.
+     * @param {Number} gomodoro - A gomodoro number existing in the Gomodoro table.
+     * @see ~/stores/gomodoro
+     */
     setTime: {
-
-        action: (type, gomodoro) => dispatch => dispatch(ActionsGomodoro.get())
-            .then(({ payload: gomodoros }) => dispatch({
-                type,
-                payload: {
-                    gomodoro,
-                    time: gomodoros[gomodoro] * 60 * 1000,
-                },
-            })),
-
+        action: (type, gomodoro) => dispatch =>
+            // Obtain the updated gomodoro table
+            dispatch(ActionsGomodoro.get()).then(({ payload: gomodoros }) =>
+                // Get the equivalent timeing and set it.
+                dispatch({
+                    type,
+                    payload: {
+                        gomodoro,
+                        time: gomodoros[gomodoro] * 60 * 1000,
+                    },
+                })),
         reducer: (prevState, { time, gomodoro }) => ({ ...prevState, time, gomodoro }),
 
     },

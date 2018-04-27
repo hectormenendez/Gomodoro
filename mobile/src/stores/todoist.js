@@ -85,7 +85,7 @@ export const { Actions, Reducers } = Factory(State, {
             return Write(tasks)
                 // get rid of the item in the storage
                 .then(response => AsyncStorage
-                    .getItem(Config.storeKey)
+                    .getItem(StoreKey)
                     .then(serializedStorage => JSON.parse(serializedStorage))
                     .then(storage => ({ storage, response })),
                 )
@@ -95,7 +95,7 @@ export const { Actions, Reducers } = Factory(State, {
                         items: storage.items.filter(item => item.id !== payload.item.id),
                     };
                     return AsyncStorage
-                        .setItem(Config.storeKey, JSON.stringify(state))
+                        .setItem(StoreKey, JSON.stringify(state))
                         .then(() => state);
                 })
                 .then(({ sync, items }) => dispatch({ type, payload: { sync, items } }));
