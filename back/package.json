@@ -1,6 +1,6 @@
 {
     "name": "gomodoro.back",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "The backend for Gomodoro.",
     "main": "src/index.js",
     "author": "Hector Menendez <hector@gik.mx>",
