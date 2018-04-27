@@ -25,7 +25,7 @@ export function Factory(initState, declarations, prefix) {
             initState: PropTypes.any.isRequired,
             declarations: PropTypes.objectOf(PropTypes.shape({
                 action: PropTypes.func.isRequired,
-                reducer: PropTypes.func.isRequired,
+                reducer: PropTypes.func,
             })),
             prefix: PropTypes.string,
         },
