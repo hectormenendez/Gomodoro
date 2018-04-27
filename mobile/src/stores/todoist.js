@@ -32,6 +32,12 @@ const getComment = (payload) => {
 
 export const { Actions, Reducers } = Factory(State, {
 
+    itemsReset: {
+        action: () => dispatch => AsyncStorage
+            .removeItem(StoreKey)
+            .then(() => dispatch(Actions.itemsFetch())),
+    },
+
     itemsFetch: {
         action: type => dispatch => AsyncStorage
             // Determine if there's something on the storage

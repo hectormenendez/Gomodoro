@@ -67,7 +67,7 @@ export class Component extends React.Component {
                 </View>
 
                 <View style={Style.ContainerContent}>
-                    <Button type="ghost" onClick={this.onCancel}>Sync</Button>
+                    <Button type="ghost" onClick={this.onSync}>Full Sync</Button>
                 </View>
 
             </Flex>
@@ -87,6 +87,11 @@ export class Component extends React.Component {
             .filter(item => item.content.toLowerCase().indexOf(text.toLowerCase()) !== -1)
             .slice(0, 15);
         return this.setState({ text, results });
+    }
+
+    onSync = () => {
+        this.setState(State);
+        this.props.dispatch(ActionsTodoist.itemsReset());
     }
 
     onCancel = () => {
