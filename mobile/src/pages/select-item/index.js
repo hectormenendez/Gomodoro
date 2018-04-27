@@ -8,6 +8,7 @@ import Markdown from 'react-native-simple-markdown';
 import ComponentLoading from '~/components/loading';
 import { Actions as ActionsTodoist, Types as TypesTodoist } from '~/stores/todoist';
 import { Actions as ActionsSelected, Types as TypesSelected } from '~/stores/selected';
+import { Actions as ActionsGomodooro } from '~/stores/gomodoro';
 
 import StyleProps from './style';
 
@@ -16,6 +17,7 @@ export const Style = StyleSheet.create(StyleProps);
 export const State = {
     text: '',
     results: [],
+    settings: false,
 };
 
 export class Component extends React.Component {
@@ -66,14 +68,29 @@ export class Component extends React.Component {
                     </List>
                 </View>
 
-                <View style={Style.ContainerContent}>
-                    <Button type="ghost" onClick={this.onSync}>Full Sync</Button>
-                </View>
+                <Button onClick={this.onToggleSettings}>⚙️</Button>
+
+                {this.state.settings &&
+                    <Flex style={Style.ContainerContent} direction="row" justify="between">
+                        <Button
+                            type="warning"
+                            onClick={this.onResetTodoist}>
+                            Reset Todoist
+                        </Button>
+                        <Button
+                            type="warning"
+                            onClick={this.onResetGomodoro}>
+                            Reset Gomodoro
+                        </Button>
+                    </Flex>
+                }
 
             </Flex>
 
         </SafeAreaView>;
     }
+
+    onToggleSettings = () => this.setState({ settings: !this.state.settings });
 
     onSelect = (index) => {
         this.props.dispatch(ActionsSelected.setItem(this.state.results[index]));
@@ -89,9 +106,13 @@ export class Component extends React.Component {
         return this.setState({ text, results });
     }
 
-    onSync = () => {
+    onResetTodoist = () => {
         this.setState(State);
         this.props.dispatch(ActionsTodoist.itemsReset());
+    }
+
+    onResetGomodoro = () => {
+        this.props.dispatch(ActionsGomodooro.reset());
     }
 
     onCancel = () => {
